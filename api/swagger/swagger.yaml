@@ -1,0 +1,477 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: ApiBeadando MobilPenztarca API
+host: localhost:10010
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: 'Users'
+    description: Operations for user handling
+  - name: 'Authentication'
+    description: Operations for authentication handling
+  - name: 'Items'
+    description: Operations for item handling
+  - name: 'Store'
+    description: Operations for store handling
+  - name: 'Balance'
+    description: Operations for balance handling
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    in: header
+    name: X-Session-ID
+paths:
+  /users:
+    x-swagger-router-controller: users
+    post:
+      description: Creates a new user with a pair of credentials
+      operationId: createUser
+      tags:
+      - "Users"
+      parameters:
+        - name: user
+          in: body
+          description: The user to create
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/CreateUserResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      description: Deletes given user
+      security:
+        - ApiKeyAuth: []
+      operationId: deleteUser
+      tags:
+      - "Users"
+      parameters:
+        - name: user
+          in: body
+          description: delete
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/DeleteUserResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: Gets all users
+      security:
+        - ApiKeyAuth: []
+      operationId: getUser
+      tags:
+      - "Users"
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/GetUserResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /users/balance/{username}:
+    x-swagger-router-controller: users
+    put:
+      security:
+        - ApiKeyAuth: []
+      tags:
+        - Balance
+      summary: Updated balance
+      description: Updates the balance of given user
+      operationId: updateBalance
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: name of user
+          required: true
+          type: string
+        - in: body
+          name: amount
+          description: Updated user object
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateBalanceCredentials'
+      responses:
+        '200':
+          description: successful
+          schema:
+            $ref: '#/definitions/User'
+        '400':
+          description: Invalid amount 
+        '404':
+          description: balance not found
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      security:
+        - ApiKeyAuth: []
+      tags:
+        - Balance
+      summary: Gets balance of user
+      description: ''
+      operationId: getBalance
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          description: The user name for getting balance
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/User'
+        '405':
+          description: Invalid input
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /authentication/login:
+    x-swagger-router-controller: authentication
+    post:
+      description: Authenticates a user with a pair of credentials and returns a sessionID
+      operationId: login
+      tags:
+      - "Authentication"
+      parameters:
+        - name: credentials
+          in: body
+          description: Credentials to authentication the user with
+          required: true
+          schema:
+            $ref: "#/definitions/Credentials"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/AuthenticationResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /authentication/logout:
+    x-swagger-router-controller: authentication
+    get:
+      security:
+        - ApiKeyAuth: []
+      description: Logs out user
+      operationId: logout
+      tags:
+      - "Authentication"
+      parameters:
+        - name: X-SESSION-ID
+          in: header
+          description: Session ID
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/AuthenticationResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /items:
+    x-swagger-router-controller: items
+    get:
+      security:
+        - ApiKeyAuth: []
+      description: Finds items
+      operationId: getItems
+      tags:
+      - "Items"
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: 'array'
+            items:
+              $ref: "#/definitions/Item"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      security:
+        - ApiKeyAuth: []
+      description: Creates given item
+      operationId: createItem
+      tags:
+      - "Items"
+      parameters:
+        - name: item
+          required: true
+          in: body
+          description: adding item
+          schema:
+            $ref: "#/definitions/Item"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/CreateProductResponse"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse" 
+  /items/item:
+    x-swagger-router-controller: items
+    get:
+      security:
+        - ApiKeyAuth: []
+      description: Get item with the given name
+      operationId: findItem
+      tags:
+      - "Items"
+      parameters:
+        - name: productName
+          in: query
+          description: Item name
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Item"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /items/buy:
+    x-swagger-router-controller: items
+    post:
+      security:
+        - ApiKeyAuth: []
+      tags:
+        - Store
+      summary: Buy something
+      description: ''
+      operationId: placeOrder
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - name: purchase
+          in: body
+          description: order placed for purchasing
+          required: true
+          schema:
+            $ref: '#/definitions/MakePurchase'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Transaction'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /items/buy/{username}:
+    x-swagger-router-controller: items
+    get:
+      security:
+        - ApiKeyAuth: []
+      tags:
+        - Store
+      summary: 'Gets transactions for user'
+      operationId: getTransactions
+      produces:
+        - application/json
+      parameters: 
+        - in: path
+          name: username
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transaction'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+definitions:
+  User:
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+        example: 'jwalker'
+      password:
+        type: string
+        example: 'supersecret'
+      fullname:
+        type: string
+        example: 'Johnny Walker'
+      balance:
+        type: number
+        minimum: 0
+  CreateUserResponse:
+    properties:
+      _id:
+        type: string
+        example: '123'
+  CreateProductResponse:
+    properties:
+      _id:
+        type: string
+        example: '123'
+  Credentials:
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+        example: 'jwalker'
+      password:
+        type: string
+        example: 'supersecret'
+  AuthenticationResponse:
+    required:
+      - sessionID
+    properties:
+      sessionID:
+        type: string
+        example: 'axd43xs'
+  Item:
+    required:
+      - name
+      - price
+    properties:
+      name:
+        type: string
+        example: 'Avengers Infinity War'
+      price:
+        type: number
+        minimum: 0
+        example: 213
+  ErrorResponse:
+    type: object
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  DeleteUserResponse:
+    required:
+      - username
+    properties:
+      username:
+        type: string
+  GetUserResponse:
+    required:
+        - username
+    properties:
+      username:
+        type: string
+        example: 'jwalker'
+  UpdateBalanceCredentials:
+    required:
+      - username
+      - amount
+    properties:
+      username:
+        type: string
+        example: 'jwalker'
+      amount:
+        type: number
+        minimum: 0
+        example: 213
+  Transaction:
+    type: object
+    required:
+      - username
+      - item
+      - price
+      - date
+    properties:
+      username:
+          type: string
+      item:
+        type: string
+      price:
+        type: number
+        minimum: 0
+        example: 213
+      date:
+        type: string
+        format: date-time
+    xml:
+      name: Transaction
+  MakePurchase:
+    type: object
+    required:
+      - username
+      - item
+    properties:
+      username:
+        type: string
+      item:
+        type: string
