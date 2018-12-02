@@ -1,2 +1,2 @@
-# netflixapi
-Demo netflix api
+# penztarcaApi
+Demo penztarca api
