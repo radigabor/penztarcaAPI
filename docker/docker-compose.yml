@@ -53,11 +53,13 @@ services:
       retries: 15
 
   penztarca:
-    image: z2t69v/api_tarca:1.2
+    image: z2t69v/api_tarca:1.3
     restart: unless-stopped
     ports:
       - 10010:10010
 
-  penztarca:
-    image: z2t69v/api_tarca:1.2
+  penztarca_2:
+    image: z2t69v/api_tarca:1.3
     restart: unless-stopped
+    ports:
+      - 10011:10011
