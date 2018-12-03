@@ -81,8 +81,8 @@ function placeOrder(req, res) {
                 price: item.price,
                 date: date
             }
-            db.createObject('transactions', transactionToAdd)
-            var newOrder = db.getObject('transactions', { username: transactionToAdd.username, date: transactionToAdd.date })
+            var newTransaction = db.createObject('transactions', transactionToAdd)
+            var newOrder = db.getObject('transactions', { _id: newTransaction._id });
             return res.status(200).json(newOrder);
         }
     } catch (error) {
